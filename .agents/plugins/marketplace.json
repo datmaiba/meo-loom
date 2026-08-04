@@ -1,0 +1,21 @@
+{
+  "name": "meo-loom",
+  "interface": {
+    "displayName": "MeoLoom"
+  },
+  "plugins": [
+    {
+      "name": "meo-loom",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/datmaiba/meo-loom",
+        "ref": "main"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

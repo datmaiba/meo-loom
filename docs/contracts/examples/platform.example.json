@@ -1,0 +1,65 @@
+{
+  "format_revision": 1,
+  "registry_revision": "platform/1",
+  "release_version": "3.0.0-dev",
+  "version_targets": [
+    {"path": ".claude-plugin/marketplace.json", "kind": "json-pointer", "locator": "/plugins/0/version"},
+    {"path": ".claude-plugin/plugin.json", "kind": "json-pointer", "locator": "/version"},
+    {"path": ".codex-plugin/plugin.json", "kind": "json-pointer", "locator": "/version"}
+  ],
+  "children": [
+    {"kind": "domains", "path": "registry/domains.json", "revision": "domains/1"},
+    {"kind": "adapters", "path": "registry/adapters.json", "revision": "adapters/1"},
+    {"kind": "evolution", "path": "registry/evolution.json", "revision": "evolution/1"}
+  ],
+  "canonical_revision": "MeoLoom 3.0",
+  "green_revisions": ["MeoLoom 3.0"],
+  "migratable_source_revisions": ["dat-kit 2.0", "dat-kit 1.16.0"],
+  "unsupported_revisions": ["pre-marker", "unknown"],
+  "revision_descriptors": [
+    {
+      "revision": "MeoLoom 3.0",
+      "marker_rules": [{"path": "AGENTS.md", "required_text": "MeoLoom 3.0"}],
+      "required_pointer_paths": ["AGENTS.md", "CLAUDE.md"],
+      "static_template_hashes": {},
+      "snapshot_provenance": "registry/platform.json#/revision_descriptors/0",
+      "support_removal_not_before": "MeoLoom 4.0"
+    },
+    {
+      "revision": "dat-kit 2.0",
+      "marker_rules": [{"path": "AGENTS.md", "required_text": "dat-kit 2.0"}],
+      "required_pointer_paths": ["AGENTS.md", "CLAUDE.md"],
+      "static_template_hashes": {},
+      "snapshot_provenance": "registry/snapshots/project-contract-2.0.json",
+      "support_removal_not_before": "dat-kit 3.0"
+    },
+    {
+      "revision": "dat-kit 1.16.0",
+      "marker_rules": [{"path": "AGENTS.md", "required_text": "dat-kit 1.16.0"}],
+      "required_pointer_paths": ["AGENTS.md", "CLAUDE.md"],
+      "static_template_hashes": {},
+      "snapshot_provenance": "registry/snapshots/project-contract-1.16.json",
+      "support_removal_not_before": "dat-kit 3.0"
+    }
+  ],
+  "migration_edges": [
+    {
+      "migration_id": "project-contract-2-to-meoloom-3",
+      "source_revision": "dat-kit 2.0",
+      "target_revision": "MeoLoom 3.0",
+      "status": "planned"
+    },
+    {
+      "migration_id": "project-contract-1-16-to-meoloom-3",
+      "source_revision": "dat-kit 1.16.0",
+      "target_revision": "MeoLoom 3.0",
+      "status": "planned"
+    },
+    {
+      "migration_id": "project-contract-1-16-to-2",
+      "source_revision": "dat-kit 1.16.0",
+      "target_revision": "dat-kit 2.0",
+      "status": "planned"
+    }
+  ]
+}

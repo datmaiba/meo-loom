@@ -1,0 +1,27 @@
+{
+  "format_revision": 1,
+  "snapshot_revision": "project-contract-3-0/1",
+  "project_contract_revision": "MeoLoom 3.0",
+  "files": [
+    {
+      "source_template": "templates/common/AGENTS.md",
+      "target_relative_path": "AGENTS.md",
+      "ownership_class": "dat-kit",
+      "materialization_action": "copy",
+      "artifact_lifecycle": "scaffold_active",
+      "project_contract_revision": "MeoLoom 3.0",
+      "expected_content_hash": "bb40aeeb81be51ab7e1f0af2339730b9323a209192f205c43dd9701e7db18af5",
+      "precondition": "target-absent"
+    },
+    {
+      "source_template": "templates/common/docs/agent-workflow.md",
+      "target_relative_path": "docs/agent-workflow.md",
+      "ownership_class": "dat-kit",
+      "materialization_action": "copy",
+      "artifact_lifecycle": "scaffold_active",
+      "project_contract_revision": "MeoLoom 3.0",
+      "expected_content_hash": "41ef97a574bbd063526f077ffabbdcbbda6fd31e994e4700edc73dba1391bf08",
+      "precondition": "target-absent"
+    }
+  ]
+}

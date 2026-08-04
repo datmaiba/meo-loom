@@ -1,0 +1,227 @@
+{
+  "format_revision": 1,
+  "registry_revision": "evolution/1",
+  "contract_revision": "evolution/1",
+  "governed_roots": [
+    {"path": ".agents", "owner": "host-adapter-platform"},
+    {"path": ".claude-plugin", "owner": "host-adapter-platform"},
+    {"path": ".codex-plugin", "owner": "host-adapter-platform"},
+    {"path": "adapters", "owner": "host-adapter-platform"},
+    {"path": "docs", "owner": "documentation-platform"},
+    {"path": "domains", "owner": "domain-platform"},
+    {"path": "engine", "owner": "work-loop-engine"},
+    {"path": "registry", "owner": "registry-platform"},
+    {"path": "scripts", "owner": "maintainers"},
+    {"path": "skills", "owner": "domain-platform"},
+    {"path": "templates", "owner": "project-contract"}
+  ],
+  "explicit_exclusions": [
+    {"path": "README.md", "reason": "repository landing page, governed by maintainer release review", "owner": "maintainers"},
+    {"path": "scripts/spikes", "reason": "decision evidence, not shipped runtime", "owner": "maintainers"}
+  ],
+  "component_classes": [
+    {
+      "component_id": "host-adapter-packages",
+      "path_globs": [".agents/**", ".claude-plugin/**", ".codex-plugin/**", "adapters/**"],
+      "owner": "host-adapter-platform",
+      "governance_class": "B",
+      "policy_ref": "host-adapter-policy"
+    },
+    {
+      "component_id": "knowledge-work",
+      "path_globs": ["domains/knowledge-work/**", "skills/knowledge-work/**"],
+      "owner": "knowledge-work",
+      "governance_class": "B",
+      "policy_ref": "knowledge-work-policy"
+    },
+    {
+      "component_id": "software-dev",
+      "path_globs": ["domains/software-dev/**", "skills/build-loop/**"],
+      "owner": "software-dev",
+      "governance_class": "B",
+      "policy_ref": "software-dev-policy"
+    },
+    {
+      "component_id": "registry-contract",
+      "path_globs": ["docs/contracts/**", "registry/**"],
+      "owner": "registry-platform",
+      "governance_class": "C",
+      "policy_ref": "platform-contract-policy"
+    },
+    {
+      "component_id": "work-loop-engine",
+      "path_globs": ["engine/**"],
+      "owner": "work-loop-engine",
+      "governance_class": "B",
+      "policy_ref": "engine-policy"
+    },
+    {
+      "component_id": "maintainer-scripts",
+      "path_globs": ["docs/decisions/**", "scripts/*.py", "scripts/*.sh", "scripts/tests/**"],
+      "owner": "maintainers",
+      "governance_class": "B",
+      "policy_ref": "maintainer-scripts-policy"
+    },
+    {
+      "component_id": "project-contract-templates",
+      "path_globs": ["templates/**"],
+      "owner": "project-contract",
+      "governance_class": "C",
+      "policy_ref": "project-contract-policy"
+    }
+  ],
+  "signals": [
+    {
+      "signal_id": "independent-review",
+      "status": "proxy",
+      "producer": "manual-build-loop-review",
+      "artifact_or_schema_revision": "review-verdict/1",
+      "quality_limitations": "Manual verdict without telemetry-v3 event coverage.",
+      "retention": "release-evidence-window"
+    }
+  ],
+  "authorities": [
+    {
+      "authority_id": "software-dev-reviewer",
+      "role_type": "independent-reviewer",
+      "allowed_decision_classes": ["A", "B"],
+      "allowed_closer": "owner-appointed-independent-reviewer",
+      "appointments": [
+        {
+          "appointment_id": "appointment/software-dev-reviewer-1",
+          "identity": "independent-reviewer-1",
+          "role": "software-dev-reviewer",
+          "effective_from": "2026-01-01T00:00:00Z",
+          "revoked_at": null,
+          "successor_of": null,
+          "evidence_ref": "authority/software-dev-reviewer-appointment-1",
+          "evidence_hash": "1111111111111111111111111111111111111111111111111111111111111111"
+        }
+      ],
+      "succession_rule": "owner appoints a new independent reviewer",
+      "approval_evidence_contract": "recorded APPROVE verdict and gate references",
+      "revocation_rule": "owner records revocation before effective_from_run"
+    },
+    {
+      "authority_id": "knowledge-work-reviewer",
+      "role_type": "independent-fact-checker",
+      "allowed_decision_classes": ["A", "B"],
+      "allowed_closer": "owner-appointed-independent-fact-checker",
+      "appointments": [
+        {
+          "appointment_id": "appointment/knowledge-work-reviewer-1",
+          "identity": "independent-fact-checker-1",
+          "role": "knowledge-work-reviewer",
+          "effective_from": "2026-01-01T00:00:00Z",
+          "revoked_at": null,
+          "successor_of": null,
+          "evidence_ref": "authority/knowledge-work-reviewer-appointment-1",
+          "evidence_hash": "2222222222222222222222222222222222222222222222222222222222222222"
+        }
+      ],
+      "succession_rule": "owner appoints a new independent fact-checker",
+      "approval_evidence_contract": "recorded gate-by-gate fact-check verdict",
+      "revocation_rule": "owner records revocation before effective_from_run"
+    },
+    {
+      "authority_id": "platform-owner",
+      "role_type": "named-maintainer-authority",
+      "allowed_decision_classes": ["C"],
+      "allowed_closer": "Dat Mai Ba or recorded successor",
+      "appointments": [
+        {
+          "appointment_id": "appointment/platform-owner-1",
+          "identity": "Dat Mai Ba",
+          "role": "platform-owner",
+          "effective_from": "2026-01-01T00:00:00Z",
+          "revoked_at": null,
+          "successor_of": null,
+          "evidence_ref": "authority/platform-owner-appointment-1",
+          "evidence_hash": "3333333333333333333333333333333333333333333333333333333333333333"
+        }
+      ],
+      "succession_rule": "current owner records a successor in a Class C decision",
+      "approval_evidence_contract": "decision record, two independent reviews, regression, and rollback rehearsal",
+      "revocation_rule": "owner or successor records revocation before effective_from_run"
+    }
+  ],
+  "policies": [
+    {
+      "policy_id": "software-dev-policy",
+      "revision": "software-dev-policy/1",
+      "owner": "software-dev",
+      "allowed_classes": ["A", "B"],
+      "required_signals": ["independent-review"],
+      "required_gates": ["software-regression"],
+      "required_reviewers": ["software-dev-reviewer"],
+      "closer_authority_ref": "software-dev-reviewer",
+      "rollback_evidence": "semantic-owner revert plus regression"
+    },
+    {
+      "policy_id": "knowledge-work-policy",
+      "revision": "knowledge-work-policy/1",
+      "owner": "knowledge-work",
+      "allowed_classes": ["A", "B"],
+      "required_signals": ["independent-review"],
+      "required_gates": ["source-claim-fidelity"],
+      "required_reviewers": ["knowledge-work-reviewer"],
+      "closer_authority_ref": "knowledge-work-reviewer",
+      "rollback_evidence": "restore prior pack owner and rerun fact-check"
+    },
+    {
+      "policy_id": "engine-policy",
+      "revision": "engine-policy/1",
+      "owner": "work-loop-engine",
+      "allowed_classes": ["A", "B"],
+      "required_signals": ["independent-review"],
+      "required_gates": ["synthetic-pack-composition"],
+      "required_reviewers": ["software-dev-reviewer"],
+      "closer_authority_ref": "software-dev-reviewer",
+      "rollback_evidence": "engine semantic-slice rollback"
+    },
+    {
+      "policy_id": "maintainer-scripts-policy",
+      "revision": "maintainer-scripts-policy/1",
+      "owner": "maintainers",
+      "allowed_classes": ["A", "B"],
+      "required_signals": ["independent-review"],
+      "required_gates": ["full-script-regression"],
+      "required_reviewers": ["software-dev-reviewer"],
+      "closer_authority_ref": "software-dev-reviewer",
+      "rollback_evidence": "script semantic-slice rollback"
+    },
+    {
+      "policy_id": "host-adapter-policy",
+      "revision": "host-adapter-policy/1",
+      "owner": "host-adapter-platform",
+      "allowed_classes": ["A", "B"],
+      "required_signals": ["independent-review"],
+      "required_gates": ["host-adapter-conformance"],
+      "required_reviewers": ["software-dev-reviewer"],
+      "closer_authority_ref": "software-dev-reviewer",
+      "rollback_evidence": "adapter-owned path rollback and host smoke"
+    },
+    {
+      "policy_id": "project-contract-policy",
+      "revision": "project-contract-policy/1",
+      "owner": "project-contract",
+      "allowed_classes": ["C"],
+      "required_signals": ["independent-review"],
+      "required_gates": ["full-cross-component-regression", "migration-rollback-rehearsal"],
+      "required_reviewers": ["software-dev-reviewer", "knowledge-work-reviewer"],
+      "closer_authority_ref": "platform-owner",
+      "rollback_evidence": "project-contract snapshot and migration rollback"
+    },
+    {
+      "policy_id": "platform-contract-policy",
+      "revision": "platform-contract-policy/1",
+      "owner": "registry-platform",
+      "allowed_classes": ["C"],
+      "required_signals": ["independent-review"],
+      "required_gates": ["full-cross-component-regression", "rollback-rehearsal"],
+      "required_reviewers": ["software-dev-reviewer", "knowledge-work-reviewer"],
+      "closer_authority_ref": "platform-owner",
+      "rollback_evidence": "atomic contract/implementation/projection revert"
+    }
+  ]
+}

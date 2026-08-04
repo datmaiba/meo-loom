@@ -1,0 +1,1 @@
+[MeoLoom] Locate and read the repository root AGENTS.md; it is the canonical agent contract. If no AGENTS.md exists, suggest /meo-loom:project-init.

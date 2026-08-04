@@ -1,0 +1,16 @@
+{
+  "format_revision": 1,
+  "engine_id": "work-loop",
+  "engine_revision": "work-loop/1",
+  "policy": "engine/work-loop/ENGINE.md",
+  "phases": [
+    "LOAD",
+    "SELF-QUESTION",
+    "PLAN",
+    "EXECUTE",
+    "VERIFY",
+    "REVIEW",
+    "REPORT",
+    "HARVEST"
+  ]
+}

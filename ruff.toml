@@ -1,0 +1,63 @@
+# Ruff configuration for MeoLoom's External Verification Receipt Gate.
+# Scope is deliberately narrow under the public evidence contract:
+# "start with correctness/security-relevant stable rules and changed-file
+# enforcement", not a full style pass. Line-length/formatting rules (E501,
+# and the full "I"/"D" families) are intentionally excluded so this gate
+# reports real defects, not house-style noise, on a repo that was never
+# written to a fixed line-length.
+
+target-version = "py312"
+line-length = 100  # advisory only; E501 is not selected below
+
+[lint]
+# F  = pyflakes (undefined names, unused imports, unused vars — correctness)
+# E9 = pycodestyle error class (actual syntax/runtime-shape errors, not style)
+# S  = flake8-bandit (security-relevant patterns: subprocess, eval, yaml.load, etc.)
+# B  = flake8-bugbear (likely-bug patterns: mutable defaults, broad except, etc.)
+select = ["F", "E9", "S", "B"]
+
+# Nothing ignored repo-wide yet. Any suppression discovered during the
+# report-only baseline pass must be recorded here with an owner and reason
+# (plan v2 §4 non-goal: "no scanner suppression lacks owner, reason, expiry").
+ignore = []
+
+[lint.per-file-ignores]
+# Test files use assert by design (S101) and construct fixture payloads that
+# can look like hardcoded secrets to a pattern matcher (S105/S106). Tests also
+# invoke `git`/`python3`/init.sh as subprocesses to exercise real CLI behavior
+# (S603/S607) — the argv lists are hardcoded in the test source, not
+# attacker-influenced.
+# owner: maintainers | reason: test harness, no untrusted input | review: R1 baseline pass, 2026-07-22
+"scripts/tests/**/*.py" = ["S101", "S105", "S106", "S603", "S607"]
+
+# Probe/spike scripts under scripts/spikes/** are throwaway exploration code
+# (not shipped, not imported by the engine or domain packs) that intentionally
+# uses assert as a lightweight check.
+# owner: maintainers | reason: spike/probe code, never imported by production paths | review: R1 baseline pass, 2026-07-22
+# B905 included: spikes/phase1a duplicates registry.py's zip() helpers verbatim
+# as a standalone probe; same strict= judgment call as the production copy,
+# not worth diverging a throwaway file to carry it.
+"scripts/spikes/**/*.py" = ["S101", "B905"]
+
+# registry.py and contract_check.py shell out to `git` with a fixed, hardcoded
+# argv (no string-built commands, no user input reaches argv) to read repo
+# state (e.g. tracked/untracked file inventory, template provenance checks).
+# owner: registry-platform (registry.py) / maintainers (contract_check.py)
+# reason: fixed-argv subprocess calls to git, no untrusted input | review: R1 baseline pass, 2026-07-22
+"scripts/registry.py" = ["S603", "S607"]
+"scripts/contract_check.py" = ["S603"]
+
+# validate.py's personal-info gate asks git whether telemetry/events.jsonl is
+# ignored and untracked, so it can skip the local-private stream only while that
+# file genuinely cannot reach a commit. Reimplementing gitignore semantics in
+# Python was tried first and was wrong seven ways (see the comment at the call
+# site) — git is the only correct oracle. Fixed argv, no user input, and it fails
+# safe: if git is unavailable the file is scanned rather than skipped.
+# owner: maintainers | reason: fixed-argv git query, no untrusted input | review: qa-agent 2026-07-25
+"scripts/validate.py" = ["S603", "S607"]
+
+# statusline.py intentionally degrades silently on a non-critical status-line
+# render path (a broken statusline must never surface an error to the
+# terminal or block the host CLI).
+# owner: maintainers | reason: non-critical UI degrade-silently path | review: R1 baseline pass, 2026-07-22
+"scripts/statusline.py" = ["S110", "S112"]

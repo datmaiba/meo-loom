@@ -1,0 +1,5 @@
+# Review-tool dependencies — isolated from requirements-dev.txt on purpose.
+# Pinned exact versions (per plan v2 §3: "Pin third-party tool versions;
+# no floating latest in gates"). Verified available on PyPI 2026-07-22.
+ruff==0.15.22
+mypy==2.3.0

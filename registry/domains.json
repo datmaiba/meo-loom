@@ -1,0 +1,37 @@
+{
+  "format_revision": 1,
+  "registry_revision": "domains/1",
+  "contract_revision": "domain-pack/1",
+  "domains": [
+    {
+      "domain_id": "knowledge-work",
+      "contract_revision": "domain-pack/1",
+      "lifecycle": "active",
+      "pack_location": "domains/knowledge-work",
+      "trigger": {
+        "name": "knowledge-work",
+        "description": "The working loop for knowledge work — research, writing, analysis, synthesis, and documentation. Invoke when the user wants to write a researched report, produce a briefing or memo, do a literature or market review, fact-check a document, or synthesize sources into an argument. Loads the work-loop engine plus the knowledge-work Domain Pack (six slots: workflow, ground truth, gates, reviewers, deliverables, loop profile). Capped at the Goal loop — its load-bearing gate (does the cited source actually support the claim?) needs a human reviewer to close, so it never runs on a schedule or unattended. MeoLoom's first non-dev Domain Pack.",
+        "aliases": ["fact check", "research report"]
+      },
+      "required_engine_revision": "work-loop/1",
+      "gate_authority_ref": "knowledge-work-reviewer",
+      "loop_ceiling": "Goal",
+      "evolution_profile_ref": "knowledge-work-policy"
+    },
+    {
+      "domain_id": "software-dev",
+      "contract_revision": "domain-pack/1",
+      "lifecycle": "active",
+      "pack_location": "domains/software-dev",
+      "trigger": {
+        "name": "build-loop",
+        "description": "The self-questioning build loop for spec-driven software projects. Invoke on any request like \"build phase N\", \"run the build loop\", \"continue the project\", \"preflight\", \"autopilot\", or \"delegated build\", or any feature work in a repo that has a spec/ directory. Loads the work-loop engine plus the software-dev Domain Pack (six slots: workflow, ground truth, gates, reviewers, deliverables, loop profile) and resumes an interrupted build from the newest handoffs/ file.",
+        "aliases": ["build phase", "run build loop"]
+      },
+      "required_engine_revision": "work-loop/1",
+      "gate_authority_ref": "software-dev-reviewer",
+      "loop_ceiling": "Goal",
+      "evolution_profile_ref": "software-dev-policy"
+    }
+  ]
+}

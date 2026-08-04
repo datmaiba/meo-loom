@@ -1,0 +1,27 @@
+{
+  "format_revision": 1,
+  "snapshot_revision": "project-contract-2-0/1",
+  "project_contract_revision": "dat-kit 2.0",
+  "files": [
+    {
+      "source_template": "templates/common/AGENTS.md",
+      "target_relative_path": "AGENTS.md",
+      "ownership_class": "dat-kit",
+      "materialization_action": "copy",
+      "artifact_lifecycle": "scaffold_active",
+      "project_contract_revision": "dat-kit 2.0",
+      "expected_content_hash": "52a92fdafc39d83145dcca540039ec8e48f309a280a9b7cdd03a099fb96c908f",
+      "precondition": "target-absent"
+    },
+    {
+      "source_template": "templates/common/docs/agent-workflow.md",
+      "target_relative_path": "docs/agent-workflow.md",
+      "ownership_class": "dat-kit",
+      "materialization_action": "copy",
+      "artifact_lifecycle": "scaffold_active",
+      "project_contract_revision": "dat-kit 2.0",
+      "expected_content_hash": "9b0e1d235a59db64c1e414d624487d779fe8cdc33d4c7e408943edf4e266df53",
+      "precondition": "target-absent"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{"id":"trg-buildloop-01","prompt":"run the build loop for phase 2","expect_skill":"build-loop","match":"run the build loop"}
+{"id":"trg-diag-01","prompt":"help me find the root cause of this flaky test","expect_skill":"diagnosing-bugs","match":"find the root cause"}
+{"id":"trg-arch-01","prompt":"find refactoring opportunities in this module","expect_skill":"improve-codebase-architecture","match":"find refactoring opportunities"}
+{"id":"trg-worktree-01","prompt":"isolate this feature so my branch stays clean","expect_skill":"git-worktrees","match":"isolate this"}
+{"id":"trg-handoff-01","prompt":"write a handoff before I stop for the day","expect_skill":"handoff","match":"write a handoff"}
+{"id":"trg-scorecard-01","prompt":"score this task for the benchmark","expect_skill":"scorecard","match":"score this task"}
+{"id":"trg-init-01","prompt":"adopt MeoLoom here in this existing repo","expect_skill":"project-init","match":"adopt MeoLoom here"}
+{"id":"trg-guardian-01","prompt":"create a guardian for this repo","expect_skill":"guardian-builder","match":"create a guardian for this repo"}
+{"id":"trg-fablemode-01","prompt":"think like fable and work carefully on this","expect_skill":"fable-mode","match":"think like fable"}
+{"id":"trg-fablepro-01","prompt":"review this contract and double-check everything","expect_skill":"fable-pro","match":"double-check everything"}
+{"id":"neg-fact-01","prompt":"what's the capital of France?","expect_skill":null,"match":null}
+{"id":"neg-chat-01","prompt":"thanks, that looks great","expect_skill":null,"match":null}
+{"id":"trg-dombuilder-01","prompt":"create a domain pack for my accounting workflow","expect_skill":"domain-builder","match":"create a domain pack"}
+{"id":"trg-knowwork-01","prompt":"write a researched report on EV battery supply chains","expect_skill":"knowledge-work","match":"write a researched report"}
+{"id":"trg-cookbook-01","prompt":"is there a cookbook example for RAG we can start from?","expect_skill":"cookbook-lookup","match":"find a recipe in the cookbook"}
+{"id":"trg-terse-01","prompt":"talk terse from now on, drop the filler","expect_skill":"terse-mode","match":"talk terse"}
+{"id":"trg-scorecard-02","prompt":"log this completed task in the scorecard","expect_skill":"scorecard","match":"log this completed task"}
+{"id":"trg-kit-evolve-01","prompt":"mine one evolution proposal from our committed evidence","expect_skill":"kit-evolve","match":"mine one evolution proposal"}

@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": [
+              "-e",
+              "const p=require('path'),f=p.join(process.env.CLAUDE_PLUGIN_ROOT,'templates','session-bootstrap.txt');console.log(require('fs').readFileSync(f,'utf8'))"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

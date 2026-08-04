@@ -1,0 +1,14 @@
+.DS_Store
+.claude/settings.local.json
+CLAUDE.local.md
+node_modules/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.codex/config.toml
+.worktrees/
+.envrc
+phase1b-smoke/
+reports/
+.personal-info-tokens.local*
+bridge.local.json*

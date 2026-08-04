@@ -1,0 +1,45 @@
+{
+  "mode": "inspect-brownfield",
+  "entries": [
+    {
+      "source_template": "adapters/cursor/cursorrules.legacy",
+      "target_relative_path": ".cursorrules",
+      "ownership_class": "adapter",
+      "materialization_action": "RETIRE_LEGACY",
+      "artifact_lifecycle": "retired",
+      "project_contract_revision": "dat-kit 1.16.0",
+      "expected_content_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "precondition": "approved-backup-and-exact-hash"
+    },
+    {
+      "source_template": "templates/common/AGENTS.md",
+      "target_relative_path": "AGENTS.md",
+      "ownership_class": "dat-kit",
+      "materialization_action": "copy",
+      "artifact_lifecycle": "scaffold_active",
+      "project_contract_revision": "MeoLoom 3.0",
+      "expected_content_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "precondition": "target-absent"
+    },
+    {
+      "source_template": "templates/common/AGENTS.md",
+      "target_relative_path": "CUSTOMIZED.md",
+      "ownership_class": "user",
+      "materialization_action": "preserve",
+      "artifact_lifecycle": "migration_ready",
+      "project_contract_revision": "dat-kit 1.16.0",
+      "expected_content_hash": null,
+      "precondition": "target-user-owned-preserve"
+    },
+    {
+      "source_template": "templates/adapters/gemini-cli/GEMINI.md",
+      "target_relative_path": "GEMINI.md",
+      "ownership_class": "adapter",
+      "materialization_action": "copy",
+      "artifact_lifecycle": "repo_only",
+      "project_contract_revision": "MeoLoom 3.0",
+      "expected_content_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "precondition": "target-absent"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "producers": {
+    "build-loop-harvest": {
+      "status": "planned",
+      "event_id": null
+    },
+    "diagnosing-bugs": {
+      "status": "planned",
+      "event_id": null
+    },
+    "knowledge-work-fact-check": {
+      "status": "planned",
+      "event_id": null
+    },
+    "task-handoff": {
+      "status": "planned",
+      "event_id": null
+    },
+    "reports": {
+      "status": "planned",
+      "event_id": null
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "meo-loom",
+  "displayName": "MeoLoom",
+  "version": "3.0.0",
+  "description": "A spec-driven development toolkit for Claude Code and Codex: Fable-style working discipline, a self-questioning build loop with subagent review, project scaffolding with stack profiles, and a lessons-learned system. Extensible to non-dev work via Domain Packs.",
+  "author": {
+    "name": "Dat Mai Ba",
+    "url": "https://github.com/datmaiba"
+  },
+  "homepage": "https://github.com/datmaiba/meo-loom",
+  "repository": "https://github.com/datmaiba/meo-loom",
+  "license": "MIT",
+  "hooks": "./hooks.json",
+  "keywords": [
+    "spec-driven-development",
+    "skills",
+    "methodology",
+    "build-loop",
+    "scaffolding",
+    "lessons-learned"
+  ]
+}

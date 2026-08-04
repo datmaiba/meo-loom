@@ -1,0 +1,37 @@
+{
+  "format_revision": 1,
+  "registry_revision": "domains/1",
+  "contract_revision": "domain-pack/1",
+  "domains": [
+    {
+      "domain_id": "knowledge-work",
+      "contract_revision": "domain-pack/1",
+      "lifecycle": "active",
+      "pack_location": "domains/knowledge-work",
+      "trigger": {
+        "name": "knowledge-work",
+        "description": "Run the evidence-grounded research and writing workflow.",
+        "aliases": ["fact check", "research report"]
+      },
+      "required_engine_revision": "work-loop/1",
+      "gate_authority_ref": "knowledge-work-reviewer",
+      "loop_ceiling": "Goal",
+      "evolution_profile_ref": "knowledge-work-policy"
+    },
+    {
+      "domain_id": "software-dev",
+      "contract_revision": "domain-pack/1",
+      "lifecycle": "active",
+      "pack_location": "domains/software-dev",
+      "trigger": {
+        "name": "build-loop",
+        "description": "Execute an approved software plan through independent gates.",
+        "aliases": ["build phase", "run build loop"]
+      },
+      "required_engine_revision": "work-loop/1",
+      "gate_authority_ref": "software-dev-reviewer",
+      "loop_ceiling": "Goal",
+      "evolution_profile_ref": "software-dev-policy"
+    }
+  ]
+}

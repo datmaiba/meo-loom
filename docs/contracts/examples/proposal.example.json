@@ -1,0 +1,37 @@
+{
+  "format_revision": 1,
+  "proposal_id": "proposal-d9eda2b418bb162941c7",
+  "created_at": "2026-07-18T00:00:00Z",
+  "proposer_identity": "maintainer-session-2026-07-18",
+  "policy_revision": "software-dev-policy/1",
+  "policy_hash": "a8bdfbc456f6eae18410ed12eccdf88b0dced03c8b0b56bd7f225ed309bf8d0b",
+  "governed_owner": "software-dev",
+  "governance_class": "B",
+  "evidence_window": {
+    "start": "2026-07-01T00:00:00Z",
+    "end": "2026-07-17T23:59:59Z"
+  },
+  "input_hashes": [
+    {
+      "path": "benchmarks/defects.jsonl",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
+      "path": "lessons-learned/lessons-learned.md",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    }
+  ],
+  "affected_paths": ["domains/software-dev/gates.md"],
+  "baseline_refs": ["baseline/software-dev-gates-2026-07-17"],
+  "evidence_refs": ["evidence/defect-cluster-2026-07"],
+  "hypothesis": "A revised gaming line catches the observed false-green review pattern.",
+  "patch_scope": ["domains/software-dev/gates.md"],
+  "required_gates": ["software-regression"],
+  "required_reviewers": ["software-dev-reviewer"],
+  "closer_authority_ref": "software-dev-reviewer",
+  "observation_window": {
+    "start": "2026-07-19T00:00:00Z",
+    "end": "2026-08-02T00:00:00Z"
+  },
+  "rollback_condition": "Revert if defect or false-positive rate increases during observation."
+}

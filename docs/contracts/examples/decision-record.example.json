@@ -1,0 +1,16 @@
+{
+  "format_revision": 1,
+  "decision_id": "decision-d9eda2b418bb162941c7-0001",
+  "proposal_id": "proposal-d9eda2b418bb162941c7",
+  "decision": "approved",
+  "decided_at": "2026-07-18T12:00:00Z",
+  "policy_revision": "software-dev-policy/1",
+  "policy_hash": "a8bdfbc456f6eae18410ed12eccdf88b0dced03c8b0b56bd7f225ed309bf8d0b",
+  "closer_identity": "independent-reviewer-1",
+  "closer_role": "software-dev-reviewer",
+  "approval_reference": "appointment/software-dev-reviewer-1#proposal-d9eda2b418bb162941c7",
+  "gate_evidence_refs": ["gate/software-regression-2026-07-18"],
+  "effective_from_run": "run-2026-07-19-001",
+  "observation_status": "observing",
+  "correction_of": null
+}

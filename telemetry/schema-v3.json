@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dat-kit.invalid/schemas/telemetry-v3.json",
+  "title": "MeoLoom Telemetry v3 event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "task_id",
+    "event_type",
+    "occurred_at",
+    "producer",
+    "revisions",
+    "lineage",
+    "source_class",
+    "privacy_class",
+    "coverage",
+    "tokens",
+    "elapsed",
+    "payload"
+  ],
+  "properties": {
+    "schema_version": {"const": 3},
+    "event_id": {"$ref": "#/$defs/uuid4"},
+    "task_id": {"$ref": "#/$defs/uuid4"},
+    "event_type": {"enum": [
+      "task_started",
+      "task_finished",
+      "handoff_created",
+      "task_resumed",
+      "delegation_started",
+      "gate_result",
+      "review_result",
+      "defect_recorded",
+      "rework_recorded",
+      "lesson_candidate_recorded",
+      "fact_check_recorded",
+      "scorecard_imported",
+      "benchmark_exported"
+    ]},
+    "occurred_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+    },
+    "producer": {"$ref": "#/$defs/producer"},
+    "revisions": {"$ref": "#/$defs/revisions"},
+    "lineage": {"$ref": "#/$defs/lineage"},
+    "source_class": {"enum": ["runtime", "repository", "human", "legacy_import", "derived"]},
+    "privacy_class": {"enum": ["public", "project", "local_private"]},
+    "coverage": {"$ref": "#/$defs/coverage"},
+    "tokens": {"$ref": "#/$defs/tokens"},
+    "elapsed": {"$ref": "#/$defs/elapsed"},
+    "payload": {"type": "object"}
+  },
+  "allOf": [
+    {"if": {"properties": {"event_type": {"const": "task_started"}}}, "then": {"properties": {"payload": {"$ref": "#/$defs/payloads/task_started"}}}},
+    {"if": {"properties": {"event_type": {"const": "task_finished"}}}, "then": {"properties": {"payload": {"$ref": "#/$defs/payloads/task_finished"}}}},
+    {"if": {"properties": {"event_type": {"const": "handoff_created"}}}, "then": {"properties": {"payload": {"$ref": "#/$defs/payloads/handoff_created"}}}},
+    {"if": {"properties": {"event_type": {"const": "task_resumed"}}}, "then": {"properties": {"payload": {"$ref": "#/$defs/payloads/task_resumed"}}}},
+    {"if": {"properties": {"event_type": {"const": "delegation_started"}}}, "then": {"properties": {"payload": {"$ref": "#/$defs/payloads/delegation_started"}}}},
+    {"if": {"properties": {"event_type": {"const": "gate_result"}}}, "then": {"properties": {"payload": {"$ref": "#/$defs/payloads/gate_result"}}}},
+    {"if": {"properties": {"event_type": {"const": "review_result"}}}, "then": {"properties": {"payload": {"$ref": "#/$defs/payloads/review_result"}}}},
+    {"if": {"properties": {"event_type": {"const": "defect_recorded"}}}, "then": {"properties": {"payload": {"$ref": "#/$defs/payloads/defect_recorded"}}}},
+    {"if": {"properties": {"event_type": {"const": "rework_recorded"}}}, "then": {"properties": {"payload": {"$ref": "#/$defs/payloads/rework_recorded"}}}},
+    {"if": {"properties": {"event_type": {"const": "lesson_candidate_recorded"}}}, "then": {"properties": {"payload": {"$ref": "#/$defs/payloads/lesson_candidate_recorded"}}}},
+    {"if": {"properties": {"event_type": {"const": "fact_check_recorded"}}}, "then": {"properties": {"payload": {"$ref": "#/$defs/payloads/fact_check_recorded"}}}},
+    {"if": {"properties": {"event_type": {"const": "scorecard_imported"}}}, "then": {"properties": {"payload": {"$ref": "#/$defs/payloads/scorecard_imported"}}}},
+    {"if": {"properties": {"event_type": {"const": "benchmark_exported"}}}, "then": {"properties": {"payload": {"$ref": "#/$defs/payloads/benchmark_exported"}}}}
+  ],
+  "$defs": {
+    "uuid4": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "stableId": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "stableRef": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/#@-]{0,511}$",
+      "$comment": "Structural grammar only. Storage also requires immutable producer-policy authorization for the specific field and namespace."
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^(?!/)(?!.*//)(?!.*\\\\)(?!.*(?:^|/)(?:\\.|\\.\\.)(?:/|$))(?!.*[ .](?:/|$))(?!.*(?:^|/)(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][1-9]|[Ll][Pp][Tt][1-9])(?:\\.|/|$))[^\\u0000-\\u001f\\u007f]+$"
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision"],
+      "properties": {
+        "id": {"$ref": "#/$defs/stableId"},
+        "revision": {"$ref": "#/$defs/stableRef"}
+      }
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unavailable_reason"],
+      "properties": {
+        "value": {"oneOf": [{"$ref": "#/$defs/stableRef"}, {"type": "null"}]},
+        "unavailable_reason": {"oneOf": [
+          {"enum": ["not_applicable", "not_emitted", "unsupported_host", "legacy_source", "ambiguous"]},
+          {"type": "null"}
+        ]}
+      },
+      "oneOf": [
+        {"properties": {"value": {"$ref": "#/$defs/stableRef"}, "unavailable_reason": {"type": "null"}}},
+        {"properties": {"value": {"type": "null"}, "unavailable_reason": {"enum": ["not_applicable", "not_emitted", "unsupported_host", "legacy_source", "ambiguous"]}}}
+      ]
+    },
+    "revisions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["domain", "engine", "adapter", "canonical_contract", "profile"],
+      "properties": {
+        "domain": {"$ref": "#/$defs/revision"},
+        "engine": {"$ref": "#/$defs/revision"},
+        "adapter": {"$ref": "#/$defs/revision"},
+        "canonical_contract": {"$ref": "#/$defs/revision"},
+        "profile": {"$ref": "#/$defs/revision"}
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parent_task_id", "delegation_id", "correction_of", "correction_evidence_ref"],
+      "properties": {
+        "parent_task_id": {"oneOf": [{"$ref": "#/$defs/uuid4"}, {"type": "null"}]},
+        "delegation_id": {"oneOf": [{"$ref": "#/$defs/uuid4"}, {"type": "null"}]},
+        "correction_of": {"oneOf": [{"$ref": "#/$defs/uuid4"}, {"type": "null"}]},
+        "correction_evidence_ref": {"oneOf": [{"$ref": "#/$defs/stableRef"}, {"type": "null"}]}
+      },
+      "allOf": [
+        {"if": {"properties": {"parent_task_id": {"type": "null"}}}, "then": {"properties": {"delegation_id": {"type": "null"}}}, "else": {"properties": {"delegation_id": {"$ref": "#/$defs/uuid4"}}}},
+        {"if": {"properties": {"correction_of": {"type": "null"}}}, "then": {"properties": {"correction_evidence_ref": {"type": "null"}}}, "else": {"properties": {"correction_evidence_ref": {"$ref": "#/$defs/stableRef"}}}}
+      ]
+    },
+    "eventTypeArray": {
+      "type": "array",
+      "maxItems": 13,
+      "uniqueItems": true,
+      "items": {"enum": ["task_started", "task_finished", "handoff_created", "task_resumed", "delegation_started", "gate_result", "review_result", "defect_recorded", "rework_recorded", "lesson_candidate_recorded", "fact_check_recorded", "scorecard_imported", "benchmark_exported"]}
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "missing_event_types", "missing_requirement_refs", "reason"],
+      "properties": {
+        "status": {"enum": ["full", "partial"]},
+        "missing_event_types": {"$ref": "#/$defs/eventTypeArray"},
+        "missing_requirement_refs": {"type": "array", "maxItems": 128, "uniqueItems": true, "items": {"$ref": "#/$defs/stableId"}},
+        "reason": {"oneOf": [{"enum": ["completion_only", "unsupported_host_start", "telemetry_disabled", "legacy_import", "producer_failure", "unresumed_handoff", "in_progress"]}, {"type": "null"}]}
+      },
+      "oneOf": [
+        {"properties": {"status": {"const": "full"}, "missing_event_types": {"maxItems": 0}, "missing_requirement_refs": {"maxItems": 0}, "reason": {"type": "null"}}},
+        {"properties": {"status": {"const": "partial"}, "reason": {"enum": ["completion_only", "unsupported_host_start", "telemetry_disabled", "legacy_import", "producer_failure", "unresumed_handoff", "in_progress"]}}, "anyOf": [{"properties": {"missing_event_types": {"minItems": 1}}}, {"properties": {"missing_requirement_refs": {"minItems": 1}}}]}
+      ]
+    },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "attribution_status", "reason"],
+      "oneOf": [
+        {"properties": {"total": {"type": "integer", "minimum": 0}, "attribution_status": {"const": "exact"}, "reason": {"type": "null"}}},
+        {"properties": {"total": {"type": "null"}, "attribution_status": {"const": "unknown"}, "reason": {"enum": ["unsupported_provider", "missing_timestamp", "no_matching_session", "multiple_matching_sessions", "ambiguous_multi_task_session", "not_reported", "legacy_source", "telemetry_disabled"]}}}
+      ]
+    },
+    "elapsed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["milliseconds", "clock_source", "reason"],
+      "oneOf": [
+        {"properties": {"milliseconds": {"type": "integer", "minimum": 0}, "clock_source": {"enum": ["monotonic", "wall"]}, "reason": {"type": "null"}}},
+        {"properties": {"milliseconds": {"type": "null"}, "clock_source": {"const": "unknown"}, "reason": {"enum": ["not_reported", "unsupported_host", "ambiguous", "legacy_source", "telemetry_disabled"]}}}
+      ]
+    },
+    "payloads": {
+      "task_started": {"type": "object", "additionalProperties": false, "required": ["workflow"], "properties": {"workflow": {"$ref": "#/$defs/stableId"}}},
+      "task_finished": {"type": "object", "additionalProperties": false, "required": ["outcome", "scorecard_ref"], "properties": {"outcome": {"enum": ["completed", "aborted", "unknown"]}, "scorecard_ref": {"oneOf": [{"$ref": "#/$defs/path"}, {"type": "null"}]}}},
+      "handoff_created": {"type": "object", "additionalProperties": false, "required": ["handoff_ref", "reason"], "properties": {"handoff_ref": {"$ref": "#/$defs/path"}, "reason": {"enum": ["context_ceiling", "deliberate_pause", "delegation_brief"]}}},
+      "task_resumed": {"type": "object", "additionalProperties": false, "required": ["handoff_ref", "resumed_from_handoff", "resumed_from_event_id"], "properties": {"handoff_ref": {"$ref": "#/$defs/path"}, "resumed_from_handoff": {"const": true}, "resumed_from_event_id": {"$ref": "#/$defs/uuid4"}}},
+      "delegation_started": {"type": "object", "additionalProperties": false, "required": ["delegation_id", "child_task_id", "delegated_role", "brief_ref"], "properties": {"delegation_id": {"$ref": "#/$defs/uuid4"}, "child_task_id": {"$ref": "#/$defs/uuid4"}, "delegated_role": {"$ref": "#/$defs/stableId"}, "brief_ref": {"$ref": "#/$defs/path"}}},
+      "gate_result": {"type": "object", "additionalProperties": false, "required": ["gate_id", "outcome", "first_pass", "verdict_source", "evidence_ref"], "properties": {"gate_id": {"$ref": "#/$defs/stableId"}, "outcome": {"enum": ["pass", "fail", "skipped"]}, "first_pass": {"type": "boolean"}, "verdict_source": {"enum": ["human", "agent", "automation"]}, "evidence_ref": {"oneOf": [{"$ref": "#/$defs/stableRef"}, {"type": "null"}]}}},
+      "review_result": {"type": "object", "additionalProperties": false, "required": ["reviewer_id", "reviewer_class", "round", "verdict", "verdict_source", "finding_count", "evidence_ref"], "properties": {"reviewer_id": {"$ref": "#/$defs/stableId"}, "reviewer_class": {"enum": ["plan", "qa", "software-dev", "knowledge-work", "security", "owner"]}, "round": {"type": "integer", "minimum": 1}, "verdict": {"enum": ["approve", "return_to_builder", "phase_done", "revise", "skipped"]}, "verdict_source": {"enum": ["human", "agent", "automation"]}, "finding_count": {"type": "integer", "minimum": 0}, "evidence_ref": {"oneOf": [{"$ref": "#/$defs/stableRef"}, {"type": "null"}]}}},
+      "defect_recorded": {"type": "object", "additionalProperties": false, "required": ["defect_id", "introduced_task", "approving_reviewers", "gate_that_should_have_caught_it", "evidence_ref"], "properties": {"defect_id": {"$ref": "#/$defs/stableId"}, "introduced_task": {"oneOf": [{"$ref": "#/$defs/uuid4"}, {"type": "null"}]}, "approving_reviewers": {"type": "array", "maxItems": 64, "uniqueItems": true, "items": {"$ref": "#/$defs/stableId"}}, "gate_that_should_have_caught_it": {"$ref": "#/$defs/stableId"}, "evidence_ref": {"$ref": "#/$defs/stableRef"}}},
+      "rework_recorded": {"type": "object", "additionalProperties": false, "required": ["cause_event_id", "round", "reason", "evidence_ref"], "properties": {"cause_event_id": {"$ref": "#/$defs/uuid4"}, "round": {"type": "integer", "minimum": 1}, "reason": {"enum": ["gate_failure", "review_finding", "spec_correction", "other"]}, "evidence_ref": {"oneOf": [{"$ref": "#/$defs/stableRef"}, {"type": "null"}]}}},
+      "lesson_candidate_recorded": {"type": "object", "additionalProperties": false, "required": ["kit_facing", "root_cause_ref", "candidate_ref"], "properties": {"kit_facing": {"type": "boolean"}, "root_cause_ref": {"$ref": "#/$defs/stableRef"}, "candidate_ref": {"$ref": "#/$defs/stableRef"}}},
+      "fact_check_recorded": {"type": "object", "additionalProperties": false, "required": ["gate_id", "verdict", "verdict_source", "finding_count", "failure_classes", "evidence_ref"], "properties": {"gate_id": {"$ref": "#/$defs/stableId"}, "verdict": {"enum": ["sourced", "return_to_builder"]}, "verdict_source": {"enum": ["human", "agent", "automation"]}, "finding_count": {"type": "integer", "minimum": 0}, "failure_classes": {"type": "array", "maxItems": 7, "uniqueItems": true, "items": {"enum": ["unsupported_claim", "weaker_than_claim", "contradiction", "unreliable_source", "stale_source", "inadequate_coverage", "prose_contradiction"]}}, "evidence_ref": {"$ref": "#/$defs/stableRef"}}, "allOf": [{"if": {"properties": {"verdict": {"const": "sourced"}}}, "then": {"properties": {"finding_count": {"const": 0}, "failure_classes": {"maxItems": 0}}}, "else": {"properties": {"finding_count": {"minimum": 1}, "failure_classes": {"minItems": 1}}}}]},
+      "scorecard_imported": {"type": "object", "additionalProperties": false, "required": ["source_path", "source_record_ordinal", "source_record_hash", "source_record_ref"], "properties": {"source_path": {"const": "benchmarks/scorecard.jsonl"}, "source_record_ordinal": {"type": "integer", "minimum": 1}, "source_record_hash": {"$ref": "#/$defs/sha256"}, "source_record_ref": {"$ref": "#/$defs/stableRef"}}},
+      "benchmark_exported": {"type": "object", "additionalProperties": false, "required": ["export_batch_id", "target_path", "prior_hash", "exported_event_ids"], "properties": {"export_batch_id": {"$ref": "#/$defs/uuid4"}, "target_path": {"enum": ["benchmarks/telemetry-v3.jsonl", "benchmarks/defects.jsonl"]}, "prior_hash": {"oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]}, "exported_event_ids": {"type": "array", "maxItems": 256, "uniqueItems": true, "items": {"$ref": "#/$defs/uuid4"}}}}
+    }
+  }
+}

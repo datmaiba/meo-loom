@@ -1,0 +1,208 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-python:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install validation dependencies
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Registry, projection, and repository validation
+        run: python scripts/validate.py
+
+      - name: Contract, registry, and evidence tests
+        run: python -m pytest scripts/tests
+
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install validation dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Repo validation (manifests, skills, agents, hooks, info gate)
+        run: python3 scripts/validate.py
+
+      - name: Contract and evidence tests
+        run: pytest scripts/tests
+
+      - name: ShellCheck init.sh
+        run: shellcheck scripts/init.sh
+
+      - name: Smoke test init.sh (greenfield + brownfield)
+        run: |
+          set -e
+          cd "$(mktemp -d)"
+          bash "$GITHUB_WORKSPACE/scripts/init.sh" demo --desc "ci smoke"
+          test -f demo/AGENTS.md && ! grep -q '{{' demo/AGENTS.md
+          test -f demo/docs/agent-workflow.md
+          test -f demo/docs/agent-working-rules.md && ! grep -q '{{' demo/docs/agent-working-rules.md
+          test -f demo/CLAUDE.md && grep -q 'AGENTS.md' demo/CLAUDE.md
+          test -f demo/.claude/CLAUDE.md && grep -q 'AGENTS.md' demo/.claude/CLAUDE.md
+          test ! -e demo/.cursorrules
+          test ! -e demo/.cursor/rules/meo-loom.mdc
+          cd demo && rm spec/07-design.md
+          agents_hash="$(sha256sum AGENTS.md)"
+          workflow_hash="$(sha256sum docs/agent-workflow.md)"
+          rules_hash="$(sha256sum docs/agent-working-rules.md)"
+          bash "$GITHUB_WORKSPACE/scripts/init.sh" --here | grep -Eq "Done: 1 created, [0-9]+ skipped"
+          test "$agents_hash" = "$(sha256sum AGENTS.md)"
+          test "$workflow_hash" = "$(sha256sum docs/agent-workflow.md)"
+          test "$rules_hash" = "$(sha256sum docs/agent-working-rules.md)"
+          echo "init.sh smoke ✓"
+
+  # External Verification Receipt Gate.
+  # This job produces machine-readable evidence and reports/summary.json so
+  # the QA step of the build loop can be satisfied by *reading* this job's
+  # result for the candidate commit SHA, instead of re-executing pytest /
+  # validate.py inside an agent's context window. See docs/agent-workflow.md
+  # "QA evidence intake" (added alongside this job) for the read-side of the
+  # contract. The required/report-only split below is part of that public
+  # evidence contract.
+  review-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install review-tool dependencies (pinned, isolated from requirements-dev.txt)
+        run: pip install -r requirements-review.txt
+
+      - name: Install validation dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Ruff (required — correctness + security rule subset only)
+        id: ruff
+        run: |
+          mkdir -p reports
+          set +e
+          ruff check --output-format=json --output-file=reports/ruff.json .
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          # human-readable copy in the job log
+          ruff check --output-format=concise . || true
+
+      - name: mypy (report-only — never fails this job)
+        id: mypy
+        run: |
+          set +e
+          mypy scripts --config-file mypy.ini > reports/mypy.log 2>&1
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          cat reports/mypy.log
+
+      - name: Repo validation (repeat, capture exit code for the summary)
+        id: validate
+        run: |
+          set +e
+          python3 scripts/validate.py
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: pytest with JUnit XML
+        id: pytest
+        run: |
+          set +e
+          pytest scripts/tests --junitxml=reports/pytest-junit.xml
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: ShellCheck init.sh (repeat, capture exit code)
+        id: shellcheck
+        run: |
+          set +e
+          shellcheck scripts/init.sh
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Bash syntax init.sh (repeat, capture exit code)
+        id: bash_syntax
+        run: |
+          set +e
+          bash -n scripts/init.sh
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Diff check (repeat, capture exit code)
+        id: diff_check
+        run: |
+          set +e
+          git diff --check
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Compose reports/summary.json
+        run: |
+          python3 scripts/review_summary.py \
+            --junit reports/pytest-junit.xml \
+            --ruff-json reports/ruff.json --ruff-exit-code "${{ steps.ruff.outputs.exit_code }}" \
+            --mypy-log reports/mypy.log --mypy-exit-code "${{ steps.mypy.outputs.exit_code }}" \
+            --validate-exit-code "${{ steps.validate.outputs.exit_code }}" \
+            --shellcheck-exit-code "${{ steps.shellcheck.outputs.exit_code }}" \
+            --bash-syntax-exit-code "${{ steps.bash_syntax.outputs.exit_code }}" \
+            --diff-check-exit-code "${{ steps.diff_check.outputs.exit_code }}" \
+            --mode ci \
+            --repository "${{ github.repository }}" \
+            --event-name "${{ github.event_name }}" \
+            --pull-request-number "${{ github.event.pull_request.number || 0 }}" \
+            --run-id "${{ github.run_id }}" --run-attempt "${{ github.run_attempt }}" \
+            --source-head-sha "${{ github.event.pull_request.head.sha || github.sha }}" \
+            --tested-commit-sha "${{ github.sha }}" \
+            --base-sha "${{ github.event.pull_request.base.sha || github.event.before || '' }}" \
+            --os ubuntu-latest \
+            --out reports/summary.json
+
+      - name: Upload review evidence
+        # Pinned to an immutable release tag (v4.4.3) rather than a floating
+        # major-version tag, per plan v2 §3 "pin third-party actions by
+        # immutable revision".
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3 — SHA verified via GitHub API 2026-07-22
+        if: always()
+        with:
+          name: review-evidence-${{ github.sha }}-attempt-${{ github.run_attempt }}
+          path: reports/
+          retention-days: 30
+
+      - name: Fail the job if any required gate failed
+        run: |
+          python3 -c "
+          import json, sys
+          s = json.load(open('reports/summary.json'))
+          required = s['required_gate_set']
+          failed = [g for g in required if s['gates'][g]['outcome'] != 'pass']
+          if failed:
+              print('Required gate(s) failed:', failed)
+              sys.exit(1)
+          print('All required gates green.')
+          "
+
+  # CodeQL default setup is a free, non-blocking advisory scan on this public
+  # repo — enabled via Settings > Security > Code scanning > Default setup,
+  # not a workflow file. It intentionally does not appear as a job here so it
+  # never sits on the required-gate latency path (plan v2 §3).

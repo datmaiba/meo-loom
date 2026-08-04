@@ -1,0 +1,7 @@
+---
+description: dat-kit canonical contract pointer
+alwaysApply: true
+---
+
+The canonical agent contract is `AGENTS.md` at the project root. Read it
+before any substantive work. Do not add policy to this file.

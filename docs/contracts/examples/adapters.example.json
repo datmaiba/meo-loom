@@ -1,0 +1,133 @@
+{
+  "format_revision": 1,
+  "registry_revision": "adapters/1",
+  "contract_revision": "host-adapter/1",
+  "adapters": [
+    {
+      "adapter_id": "codex",
+      "aliases": ["codex-cli", "openai-codex"],
+      "contract_revision": "host-adapter/1",
+      "host": "Codex",
+      "lifecycle": "repo_only",
+      "official_facts": [
+        {
+          "fact_id": "codex-agents-native",
+          "verified_on": "2026-07-18",
+          "source_url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
+          "claim": "Codex reads AGENTS.md as project instructions.",
+          "scope": "Codex CLI 0.144.4 and official documentation",
+          "reverify_before": "phase-2-activation"
+        }
+      ],
+      "plugin_root_rules": {
+        "manifest_paths": [".codex-plugin/plugin.json", ".agents/plugins/marketplace.json"],
+        "skill_roots": ["skills"],
+        "containment_root": "plugin-root",
+        "fresh_session_required": true
+      },
+      "repository_artifact_paths": [
+        ".agents/plugins/marketplace.json",
+        ".codex-plugin/plugin.json"
+      ],
+      "project_artifacts": [],
+      "pointer_semantics": {
+        "canonical_target": "AGENTS.md",
+        "mechanism": "native",
+        "missing_target_behavior": "documented-degradation"
+      },
+      "policy_prohibition": {
+        "canonical_owner": "AGENTS.md",
+        "forbidden_categories": ["canonical-policy", "domain-policy", "engine-policy", "governance-authority"]
+      },
+      "capability_assumptions": [
+        {
+          "assumption_id": "codex-native-agents",
+          "claim": "Codex discovers the canonical AGENTS.md file.",
+          "fact_ref": "codex-agents-native",
+          "required_for": "repository-conformance"
+        }
+      ],
+      "conformance_fixtures": ["ADAPTER-CODEX-01"],
+      "smoke_command": ["codex", "exec", "--ephemeral", "-s", "read-only", "Run the installed thin-trigger pack smoke."],
+      "migration_fixture_refs": ["MIG-CLEAN-116", "MIG-CUSTOM-116"],
+      "rollback": {
+        "owned_repository_paths": [".agents/plugins/marketplace.json", ".codex-plugin/plugin.json"],
+        "owned_project_paths": [],
+        "removal_precondition": "exact-adapter-owned-hash",
+        "verification_commands": [
+          ["python", "scripts/validate.py"],
+          ["codex", "plugin", "list"]
+        ]
+      }
+    },
+    {
+      "adapter_id": "gemini-cli",
+      "aliases": ["gemini", "google-gemini-cli"],
+      "contract_revision": "host-adapter/1",
+      "host": "Gemini CLI",
+      "lifecycle": "repo_only",
+      "official_facts": [
+        {
+          "fact_id": "gemini-context-import",
+          "verified_on": "2026-07-18",
+          "source_url": "https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/gemini-md.md",
+          "claim": "Gemini context files support relative file imports.",
+          "scope": "Official Gemini CLI documentation",
+          "reverify_before": "phase-2-activation"
+        }
+      ],
+      "plugin_root_rules": {
+        "manifest_paths": ["adapters/gemini-cli/gemini-extension.json"],
+        "skill_roots": ["skills"],
+        "containment_root": "extension-root",
+        "fresh_session_required": true
+      },
+      "repository_artifact_paths": [
+        "adapters/gemini-cli/ADAPTER.md",
+        "adapters/gemini-cli/GEMINI.md.tpl",
+        "adapters/gemini-cli/gemini-extension.json"
+      ],
+      "project_artifacts": [
+        {
+          "source_template": "adapters/gemini-cli/GEMINI.md.tpl",
+          "target_relative_path": "GEMINI.md",
+          "ownership_class": "adapter",
+          "materialization_action": "render-pointer",
+          "artifact_lifecycle": "repo_only",
+          "project_contract_revision": "MeoLoom 3.0",
+          "expected_content_hash": null,
+          "precondition": "target-absent"
+        }
+      ],
+      "pointer_semantics": {
+        "canonical_target": "AGENTS.md",
+        "mechanism": "relative-import",
+        "missing_target_behavior": "clear-failure"
+      },
+      "policy_prohibition": {
+        "canonical_owner": "AGENTS.md",
+        "forbidden_categories": ["canonical-policy", "domain-policy", "engine-policy", "governance-authority"]
+      },
+      "capability_assumptions": [
+        {
+          "assumption_id": "gemini-context-import",
+          "claim": "Gemini project context can import the canonical AGENTS.md file.",
+          "fact_ref": "gemini-context-import",
+          "required_for": "pointer-conformance"
+        }
+      ],
+      "conformance_fixtures": ["ADAPTER-GEMINI-01"],
+      "smoke_command": ["gemini", "--prompt", "Run the installed thin-trigger pack smoke from {project_root}."],
+      "migration_fixture_refs": ["MIG-CLEAN-116", "MIG-CUSTOM-116"],
+      "rollback": {
+        "owned_repository_paths": ["adapters/gemini-cli/ADAPTER.md", "adapters/gemini-cli/GEMINI.md.tpl", "adapters/gemini-cli/gemini-extension.json"],
+        "owned_project_paths": ["GEMINI.md"],
+        "removal_precondition": "exact-adapter-owned-hash",
+        "verification_commands": [
+          ["python", "scripts/validate.py"],
+          ["gemini", "--version"]
+        ]
+      }
+    }
+  ]
+}

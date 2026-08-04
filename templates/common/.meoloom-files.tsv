@@ -1,0 +1,8 @@
+# GENERATED FROM REGISTRY — DO NOT EDIT; source_revision=platform/1
+templates/common/.claude/CLAUDE.md	.claude/CLAUDE.md	adapter	copy	MeoLoom 3.0	scaffold_active
+templates/adapters/cursor/meo-loom.mdc	.cursor/rules/meo-loom.mdc	adapter	copy	MeoLoom 3.0	migration_ready
+templates/common/.cursorrules	.cursorrules	adapter	copy	dat-kit 2.0	migration_ready
+templates/common/AGENTS.md	AGENTS.md	dat-kit	copy	MeoLoom 3.0	scaffold_active
+templates/common/CLAUDE.md	CLAUDE.md	adapter	copy	MeoLoom 3.0	scaffold_active
+templates/adapters/gemini-cli/GEMINI.md	GEMINI.md	adapter	copy	MeoLoom 3.0	repo_only
+templates/common/docs/agent-workflow.md	docs/agent-workflow.md	dat-kit	copy	MeoLoom 3.0	scaffold_active

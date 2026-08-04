@@ -1,0 +1,77 @@
+{
+  "format_revision": 1,
+  "registry_revision": "platform/1",
+  "release_version": "3.0.0",
+  "version_targets": [
+    {"path": ".claude-plugin/marketplace.json", "kind": "json-pointer", "locator": "/plugins/0/version"},
+    {"path": ".claude-plugin/plugin.json", "kind": "json-pointer", "locator": "/version"},
+    {"path": ".codex-plugin/plugin.json", "kind": "json-pointer", "locator": "/version"}
+  ],
+  "children": [
+    {"kind": "domains", "path": "registry/domains.json", "revision": "domains/1"},
+    {"kind": "adapters", "path": "registry/adapters.json", "revision": "adapters/1"},
+    {"kind": "evolution", "path": "registry/evolution.json", "revision": "evolution/1"}
+  ],
+  "canonical_revision": "MeoLoom 3.0",
+  "green_revisions": ["MeoLoom 3.0"],
+  "migratable_source_revisions": ["dat-kit 2.0", "dat-kit 1.16.0"],
+  "unsupported_revisions": ["pre-marker", "unknown"],
+  "revision_descriptors": [
+    {
+      "revision": "MeoLoom 3.0",
+      "marker_rules": [{"path": "AGENTS.md", "required_text": "MeoLoom 3.0"}],
+      "required_pointer_paths": ["AGENTS.md", "CLAUDE.md"],
+      "static_template_hashes": {
+        "AGENTS.md": "bb40aeeb81be51ab7e1f0af2339730b9323a209192f205c43dd9701e7db18af5",
+        "docs/agent-workflow.md": "41ef97a574bbd063526f077ffabbdcbbda6fd31e994e4700edc73dba1391bf08"
+      },
+      "snapshot_provenance": "registry/snapshots/project-contract-3.0.json",
+      "support_removal_not_before": "MeoLoom 4.0"
+    },
+    {
+      "revision": "dat-kit 2.0",
+      "marker_rules": [{"path": "AGENTS.md", "required_text": "dat-kit 2.0"}],
+      "required_pointer_paths": ["AGENTS.md", "CLAUDE.md"],
+      "static_template_hashes": {
+        "AGENTS.md": "52a92fdafc39d83145dcca540039ec8e48f309a280a9b7cdd03a099fb96c908f",
+        "docs/agent-workflow.md": "9b0e1d235a59db64c1e414d624487d779fe8cdc33d4c7e408943edf4e266df53"
+      },
+      "snapshot_provenance": "registry/snapshots/project-contract-2.0.json",
+      "support_removal_not_before": "dat-kit 3.0"
+    },
+    {
+      "revision": "dat-kit 1.16.0",
+      "marker_rules": [{"path": "AGENTS.md", "required_text": "dat-kit 1.16.0"}],
+      "required_pointer_paths": [".claude/CLAUDE.md", ".cursorrules", "CLAUDE.md"],
+      "static_template_hashes": {
+        ".claude/CLAUDE.md": "b415547a0d708b6c4230b51b86db9b3530ec6f79ff5b303e170b5a67ddf40014",
+        ".cursorrules": "f4c5adb7eb851d019e944441938ba4714b345057b5653df6c6bb4455d60e585e",
+        "AGENTS.md": "e4ad841c8eb2039aad551138c328135e6afa08abec256f7d2959d0611726b0e4",
+        "CLAUDE.md": "0ba915f65b315dd2ccb0ab299a39bf1b75fddceefa9c168c4083c28a8f7d6483",
+        "docs/agent-workflow.md": "9b0e1d235a59db64c1e414d624487d779fe8cdc33d4c7e408943edf4e266df53"
+      },
+      "snapshot_provenance": "registry/snapshots/project-contract-1.16.json",
+      "support_removal_not_before": "dat-kit 3.0"
+    }
+  ],
+  "migration_edges": [
+    {
+      "migration_id": "project-contract-2-to-meoloom-3",
+      "source_revision": "dat-kit 2.0",
+      "target_revision": "MeoLoom 3.0",
+      "status": "planned"
+    },
+    {
+      "migration_id": "project-contract-1-16-to-meoloom-3",
+      "source_revision": "dat-kit 1.16.0",
+      "target_revision": "MeoLoom 3.0",
+      "status": "planned"
+    },
+    {
+      "migration_id": "project-contract-1-16-to-2",
+      "source_revision": "dat-kit 1.16.0",
+      "target_revision": "dat-kit 2.0",
+      "status": "planned"
+    }
+  ]
+}

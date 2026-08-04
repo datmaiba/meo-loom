@@ -1,0 +1,15 @@
+{
+  "documents": {
+    ".claude-plugin/marketplace.json": {
+      "plugins": [
+        {"version": "2.0.0-dev"}
+      ]
+    },
+    ".claude-plugin/plugin.json": {
+      "version": "2.0.0-dev"
+    },
+    ".codex-plugin/plugin.json": {
+      "version": "2.0.0-dev"
+    }
+  }
+}
