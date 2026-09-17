@@ -10,7 +10,7 @@
       "source": "./",
       "displayName": "MeoLoom",
       "description": "Spec-driven development toolkit: Fable-style discipline, self-questioning build loop with subagent review, stack-profile scaffolding, lessons-learned system. Extensible to non-dev work via Domain Packs.",
-      "version": "3.0.0",
+      "version": "3.0.1",
       "author": {
         "name": "Dat Mai Ba"
       }
