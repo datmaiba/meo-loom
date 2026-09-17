@@ -16,3 +16,4 @@
 {"id":"trg-terse-01","prompt":"talk terse from now on, drop the filler","expect_skill":"terse-mode","match":"talk terse"}
 {"id":"trg-scorecard-02","prompt":"log this completed task in the scorecard","expect_skill":"scorecard","match":"log this completed task"}
 {"id":"trg-kit-evolve-01","prompt":"mine one evolution proposal from our committed evidence","expect_skill":"kit-evolve","match":"mine one evolution proposal"}
+{"id":"trg-grillme-01","prompt":"grillme before drafting this migration plan","expect_skill":"grillme","match":"grillme"}

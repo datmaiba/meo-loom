@@ -267,6 +267,7 @@
         "skills/fable-mode/**",
         "skills/fable-pro/**",
         "skills/git-worktrees/**",
+        "skills/grillme/**",
         "skills/guardian-builder/**",
         "skills/handoff/**",
         "skills/improve-codebase-architecture/**",
