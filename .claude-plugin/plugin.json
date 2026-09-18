@@ -1,7 +1,7 @@
 {
   "name": "meo-loom",
   "displayName": "MeoLoom",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "A spec-driven development toolkit for Claude Code and Codex: Fable-style working discipline, a self-questioning build loop with subagent review, project scaffolding with stack profiles, and a lessons-learned system. Extensible to non-dev work via Domain Packs.",
   "author": {
     "name": "Dat Mai Ba",
