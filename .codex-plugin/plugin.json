@@ -1,6 +1,6 @@
 {
   "name": "meo-loom",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "A spec-driven development toolkit for Claude Code and Codex: Fable-style working discipline, a self-questioning build loop with independent review, project scaffolding, and lessons learned.",
   "author": {
     "name": "Dat Mai Ba",
