@@ -407,7 +407,13 @@ def test_partial_clone_detection_exists_and_is_separate_from_shallow():
 # The repo-copy fixture and the validate runner live in repo_fixture.py so this module
 # and test_load_instrumentation.py cannot drift apart on the linked-worktree .git hazard
 # documented there. plan-reviewer round 2.
-from repo_fixture import repo_copy as _repo_copy, run_validate as _validate  # noqa: E402
+from repo_fixture import (  # noqa: E402
+    UNRELATED_FINDING,
+    assert_validate_completed,
+    repo_copy as _repo_copy,
+    run_validate as _validate,
+    seed_unrelated_finding,
+)
 
 
 # Synthetic public test data: it intentionally identifies no person, company,
@@ -499,26 +505,37 @@ def test_personal_info_gate_still_skips_a_genuinely_private_local_stream(tmp_pat
     # Assert the PROPERTY, not that every unrelated check is green on a copy of the
     # working tree - any local finding would otherwise red this test for the wrong
     # reason (code-reviewer round 4).
+    assert_validate_completed(code, out)
     assert "telemetry/events.jsonl" not in out
     assert _CANARY_TOKEN not in out, "the gate echoed the local-private stream"
 
 
 @pytest.mark.skipif(not _is_git_checkout(ROOT), reason="needs a git checkout to copy")
-def test_personal_info_gate_requires_the_local_token_file(tmp_path):
+@pytest.mark.parametrize("unrelated", [False, True], ids=["clean", "unrelated"])
+def test_personal_info_gate_requires_the_local_token_file(tmp_path, unrelated):
     """The local loader, rather than a tracked denylist, enables detection."""
     root = _repo_copy(tmp_path)
+    if unrelated:
+        seed_unrelated_finding(root)
     _remove_personal_info_tokens(root)
     (root / "telemetry" / ".gitignore").write_text("# events.jsonl\n", encoding="utf-8")
     (root / "telemetry" / "events.jsonl").write_text(CANARY, encoding="utf-8")
 
     absent_code, absent_out = _validate(root)
-    assert absent_code == 0, absent_out[-400:]
+    assert_validate_completed(absent_code, absent_out)
     assert "telemetry/events.jsonl" not in absent_out.replace("\\", "/")
+    assert (UNRELATED_FINDING in absent_out) is unrelated
+    if unrelated:
+        assert absent_code == 1, "production validation must reject the unrelated finding"
 
     _write_personal_info_tokens(root)
     present_code, present_out = _validate(root)
     assert present_code != 0, present_out[-400:]
     _assert_the_gate_flagged_the_canary_file(present_out)
+    assert_validate_completed(present_code, present_out)
+    assert (UNRELATED_FINDING in present_out) is unrelated
+    if unrelated:
+        assert present_code == 1
 
 
 @pytest.mark.skipif(not _is_git_checkout(ROOT), reason="needs a git checkout to copy")
@@ -534,7 +551,8 @@ def test_personal_info_loader_ignores_comments_blanks_and_regex_metacharacters(t
     target.write_text(comment + "\n" + token.replace(".", "X") + "\n", encoding="utf-8")
 
     near_miss_code, near_miss_out = _validate(root)
-    assert near_miss_code == 0, near_miss_out[-400:]
+    assert_validate_completed(near_miss_code, near_miss_out)
+    assert "telemetry/events.jsonl" not in near_miss_out.replace("\\", "/")
 
     target.write_text(token + "\n", encoding="utf-8")
     exact_code, exact_out = _validate(root)

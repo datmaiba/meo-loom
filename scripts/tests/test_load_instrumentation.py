@@ -25,8 +25,17 @@ from pathlib import Path
 import re
 
 import pytest
+import yaml
 
-from repo_fixture import ROOT, is_git_checkout, repo_copy, run_validate
+from repo_fixture import (
+    ROOT,
+    UNRELATED_FINDING,
+    assert_validate_completed,
+    is_git_checkout,
+    repo_copy,
+    run_validate,
+    seed_unrelated_finding,
+)
 
 
 TELEMETRY_HEADING = "## Telemetry"
@@ -99,7 +108,8 @@ def test_gate_reds_when_the_newest_post_baseline_handoff_lacks_the_section(tmp_p
     assert _missing_section_finding("HANDOFF-2026-07-26-no-telemetry.md") in out
 
 
-def test_gate_greens_when_the_newest_post_baseline_handoff_has_the_section(tmp_path):
+@pytest.mark.parametrize("unrelated", [False, True], ids=["clean", "unrelated"])
+def test_gate_greens_when_the_newest_post_baseline_handoff_has_the_section(tmp_path, unrelated):
     """The positive case — asserted as a PAIR, so it cannot survive deleting the gate.
 
     An absence-assertion alone passes when the gate is removed entirely, which qa-agent
@@ -107,11 +117,16 @@ def test_gate_greens_when_the_newest_post_baseline_handoff_has_the_section(tmp_p
     makes the test mutation-sensitive: green with the section, red without it.
     """
     root = repo_copy(tmp_path, clear_handoffs=True)
+    if unrelated:
+        seed_unrelated_finding(root)
     name = "HANDOFF-2026-07-26-compliant.md"
     path = _handoff(root, name, section=COMPLIANT_SECTION)
     code, out = run_validate(root)
-    assert code == 0, out[-400:]
+    assert_validate_completed(code, out)
     assert not _handoff_findings(out), out
+    assert (UNRELATED_FINDING in out) is unrelated
+    if unrelated:
+        assert code == 1, "production validation must reject the unrelated finding"
 
     path.write_text(
         "# h\n\n## Goal\nfixture.\n\n## Workflow\ndomain_pack: software-dev\n",
@@ -119,6 +134,10 @@ def test_gate_greens_when_the_newest_post_baseline_handoff_has_the_section(tmp_p
     )
     code, out = run_validate(root)
     assert code != 0 and _missing_section_finding(name) in out, "the gate is not live"
+    assert_validate_completed(code, out)
+    assert (UNRELATED_FINDING in out) is unrelated
+    if unrelated:
+        assert code == 1
 
 
 def test_a_handoff_that_mentions_the_heading_in_earlier_prose_still_passes(tmp_path):
@@ -137,7 +156,7 @@ def test_a_handoff_that_mentions_the_heading_in_earlier_prose_still_passes(tmp_p
     )
     (root / "handoffs" / name).write_text(body, encoding="utf-8")
     code, out = run_validate(root)
-    assert code == 0, out[-400:]
+    assert_validate_completed(code, out)
     assert not _handoff_findings(out), out
 
 
@@ -219,7 +238,7 @@ def test_an_honestly_declared_non_emit_satisfies_the_section_only_with_a_reason(
         assert code != 0, out[-400:]
         assert f"handoffs/{name}: '{TELEMETRY_HEADING}'" in out
     else:
-        assert code == 0, out[-400:]
+        assert_validate_completed(code, out)
         assert not _handoff_findings(out), out
 
 
@@ -288,7 +307,7 @@ def test_gate_selects_by_handoff_prefix_and_filename_order_not_mtime(tmp_path):
 
     assert sorted(p.name for p in (root / "handoffs").iterdir())[-1] == trailing.name
     code, out = run_validate(root)
-    assert code == 0, out[-400:]
+    assert_validate_completed(code, out)
     assert _missing_section_finding(old.name) not in out, "selector followed mtime"
     assert _missing_section_finding(trailing.name) not in out, "selector ignored the prefix"
     assert _missing_section_finding(newest.name) not in out, "the right file was refused"
@@ -326,7 +345,7 @@ def test_a_fence_inside_the_section_does_not_truncate_it(tmp_path):
     )
     (root / "handoffs" / name).write_text(body, encoding="utf-8")
     code, out = run_validate(root)
-    assert code == 0, out[-400:]
+    assert_validate_completed(code, out)
     assert not _handoff_findings(out), out
 
 
@@ -359,7 +378,8 @@ def test_gate_ignores_handoffs_at_or_before_the_baseline(tmp_path):
     baseline = _baseline()
     _handoff(root, baseline)
     _handoff(root, "HANDOFF-2026-07-20-older.md")
-    _, out = run_validate(root)
+    code, out = run_validate(root)
+    assert_validate_completed(code, out)
     assert _missing_section_finding(baseline) not in out
     assert _missing_section_finding("HANDOFF-2026-07-20-older.md") not in out
 
@@ -367,7 +387,8 @@ def test_gate_ignores_handoffs_at_or_before_the_baseline(tmp_path):
 def test_gate_is_a_no_op_when_there_are_no_handoff_files(tmp_path):
     """A fresh clone of the kit into a new project has no handoffs."""
     root = repo_copy(tmp_path, clear_handoffs=True)
-    _, out = run_validate(root)
+    code, out = run_validate(root)
+    assert_validate_completed(code, out)
     # Scoped to findings about handoff ARTIFACTS. The SKILL.md spec check emits the same
     # "missing required handoff section" phrase, so a bare substring assertion here would
     # be satisfied by an unrelated finding about a different file.
@@ -421,7 +442,8 @@ def test_domain_pack_none_is_valid_without_a_telemetry_declaration(tmp_path):
     root = repo_copy(tmp_path, clear_handoffs=True)
     _handoff(root, "HANDOFF-2026-07-26-standalone.md", domain_pack="none")
     code, out = run_validate(root)
-    assert code == 0, out[-400:]
+    assert_validate_completed(code, out)
+    assert not _handoff_findings(out), out
 
 
 def test_domain_pack_none_cannot_opt_out_of_a_build_loop_handoff(tmp_path):
@@ -467,4 +489,44 @@ def test_newer_non_software_dev_handoff_does_not_replace_software_dev_selector(t
     _handoff(root, "HANDOFF-2026-07-26-software-dev.md", section=COMPLIANT_SECTION)
     _handoff(root, "HANDOFF-2026-07-27-knowledge-work.md", domain_pack="knowledge-work")
     code, out = run_validate(root)
-    assert code == 0, out[-400:]
+    assert_validate_completed(code, out)
+    assert not _handoff_findings(out), out
+
+
+@pytest.mark.parametrize(
+    "code, out",
+    [
+        (0, ""),
+        (0, "❌ 1 finding(s):\n - synthetic finding\n"),
+        (1, "✓ all checks green\n"),
+        (1, "❌ 1 finding(s):\n"),
+        (1, "❌ 2 finding(s):\n - synthetic finding\n"),
+        (1, "❌ 1 finding(s):\nnot a finding\n"),
+        (2, "❌ 1 finding(s):\n - synthetic finding\n"),
+        (1, "❌ 1 finding(s):\n - Traceback (most recent call last):\n"),
+        (1, "❌ 1 finding(s):\n - synthetic finding"),
+        (1, "❌ 1 finding(s):\ncontinuation before finding\n - synthetic finding\n"),
+        (1, "\n❌ 1 finding(s):\n - synthetic finding\n"),
+        (1, "❌ 1 finding(s):\n - \n"),
+        (1, "❌ 1 finding(s):\n - synthetic finding\n\n"),
+    ],
+    ids=["empty", "success-with-findings", "failure-with-green", "truncated",
+         "wrong-count", "malformed-finding", "unexpected-exit", "traceback",
+         "unterminated", "continuation-before-marker", "prefixed-header",
+         "empty-marker", "empty-continuation"],
+)
+def test_scoped_validation_rejects_incomplete_or_crashed_runs(code, out):
+    """An absent target diagnostic is insufficient if validation never completed."""
+    with pytest.raises(AssertionError):
+        assert_validate_completed(code, out)
+
+
+def test_scoped_validation_accepts_multiline_yaml_finding():
+    """One YAML exception remains one finding despite its context and caret lines."""
+    with pytest.raises(yaml.YAMLError) as caught:
+        yaml.safe_load("name: [unfinished\n")
+    diagnostic = str(caught.value)
+    assert any(line and not line.strip() for line in diagnostic.splitlines())
+    finding = f"skills/example/SKILL.md: frontmatter YAML error: {diagnostic}"
+    out = f"❌ 1 finding(s):\n - {finding}\n"
+    assert_validate_completed(1, out)

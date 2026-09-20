@@ -9,6 +9,30 @@ editing. Work dependency-first, keep changes commit-sized, and run every declare
 gate before reporting completion. Plans and spec amendments require explicit
 approval; execution of an already approved plan does not require a second gate.
 
+## Red-gate recovery
+
+On a red gate, classify the cause as `change-induced`, `pre-existing`,
+`environment`, or `unknown`. Retain the exact command, cwd, relevant input or
+environment identity, diagnostic, stdout, stderr, exit status, and completion
+status. Capture private, access-scoped logs from command start for long or
+interruptible runs; exclude secrets and record their paths in the report. An
+interrupted run is incomplete, never a pass; `unknown` is not a waiver.
+
+QA reports the cause, exact evidence, and the condition needed for a rerun, then
+stops its verdict. The controller assigns an owner and chooses an authorized
+repair, environment correction, evidence collection, scope amendment, or blocked
+state. Rerun only after a relevant input or environment change, a concrete
+evidence gap, or Dat's explicit request. An unchanged known failure requires
+diagnosis, not a speculative full-suite rerun, and a requested rerun does not
+waive the failure.
+
+Focused tests support diagnosis and repair; they are not whole QA. Closure still
+requires every full final gate required by the approved plan and governance.
+Distinguish fail-fast, targeted, and full-suite results. Keep the existing finite
+consult/retry discipline: one evidence-based consult and one final retry on its
+plan; persistent failure stops with logs and remaining work. Renaming a task
+does not reset those counters.
+
 ## QA evidence intake (R1 — External Verification Receipt Gate)
 
 The `review-evidence` CI job (`.github/workflows/ci.yml`) runs Ruff, mypy

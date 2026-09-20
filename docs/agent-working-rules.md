@@ -27,6 +27,21 @@ git diff --check
 When a gate itself changes, prove red-before-green with an isolated failing
 fixture before trusting the final green run.
 
+For a red gate, preserve a private, access-scoped command-start log containing
+the command, cwd, relevant input or environment identity, diagnostic, stdout,
+stderr, exit status, and completion status; never log secrets. Classify the
+cause as `change-induced`, `pre-existing`, `environment`, or `unknown`.
+`Unknown` and an interrupted run are not passes. QA reports the cause, exact
+evidence, and condition for rerun, then stops; it never repairs. The controller
+assigns an owner and an authorized response before a warranted rerun.
+
+Rerun only for a relevant input or environment change, a concrete evidence gap,
+or Dat's explicit request. Diagnose unchanged known failures instead of
+speculatively rerunning the full suite. Focused checks are diagnostic or repair
+evidence, never whole QA; final closure still runs every gate required by the
+plan and governance. Preserve the existing one evidence-based consult and one
+final retry discipline; persistent failure stops with logs and remaining work.
+
 ## Scope and evidence
 
 - Preserve user changes and append-only benchmark history.

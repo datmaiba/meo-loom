@@ -48,7 +48,7 @@ def codes(report: cc.Report) -> set[str]:
 def test_meoloom_is_the_only_current_revision() -> None:
     payload = platform()
     assert payload["format_revision"] == 1
-    assert payload["release_version"] == "3.0.2"
+    assert payload["release_version"] == "3.0.3"
     assert payload["canonical_revision"] == CURRENT
     assert payload["green_revisions"] == [CURRENT]
     assert payload["migratable_source_revisions"] == [LEGACY_V2, LEGACY_V116]

@@ -1,7 +1,7 @@
 {
   "format_revision": 1,
   "registry_revision": "platform/1",
-  "release_version": "3.0.2",
+  "release_version": "3.0.3",
   "version_targets": [
     {"path": ".claude-plugin/marketplace.json", "kind": "json-pointer", "locator": "/plugins/0/version"},
     {"path": ".claude-plugin/plugin.json", "kind": "json-pointer", "locator": "/version"},
